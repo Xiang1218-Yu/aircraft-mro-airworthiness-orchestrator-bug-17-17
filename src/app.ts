@@ -5,6 +5,7 @@ import { ExternalEventService } from './services/external-event-service.js';
 import { InstallationService } from './services/installation-service.js';
 import { InventoryService } from './services/inventory-service.js';
 import { SettlementService } from './services/settlement-service.js';
+import { ShipmentService } from './services/shipment-service.js';
 import { SlaService } from './services/sla-service.js';
 import { TenantJobService } from './services/tenant-job-service.js';
 import { WorkOrderService } from './services/work-order-service.js';
@@ -16,6 +17,7 @@ export class MroApplication {
   readonly certificates = new CertificateService(this.store);
   readonly workOrders = new WorkOrderService(this.store);
   readonly customs = new CustomsService(this.store);
+  readonly shipments = new ShipmentService(this.store, this.customs);
   readonly tenantJobs = new TenantJobService(this.store);
   readonly settlement = new SettlementService(this.store);
   readonly installation = new InstallationService(this.store);

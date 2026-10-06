@@ -8,6 +8,9 @@ import type {
   OutboxMessage,
   PartStock,
   Reservation,
+  Shipment,
+  ShipmentAllocation,
+  ShipmentSplitRequest,
   WorkOrder,
   ExternalEvent,
 } from '../domain/types.js';
@@ -63,6 +66,13 @@ export class Store {
   addLedger(entry: Omit<LedgerEntry, 'id' | 'createdAt'>): void {
     this.ledger.push({ ...entry, id: this.nextId('ledger'), createdAt: this.now() });
   }
-  readonly shipments = new Map<string, import('../domain/types.js').Shipment>();
+  readonly shipments = new Map<string, Shipment>();
+  readonly shipmentAllocations = new Map<string, ShipmentAllocation>();
+  /** idempotency records for split attempts, keyed by parentId|splitKey */
+  readonly splitRequests = new Map<string, ShipmentSplitRequest>();
+  /**
+   * Recomputed customs projection: declared quantity per tenant/order/root order line.
+   * Rebuilt from ACTIVE shipments only; parent and child can never both count.
+   */
   readonly customsLines = new Map<string, number>();
 }

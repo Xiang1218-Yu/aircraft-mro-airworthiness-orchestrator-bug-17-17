@@ -4,7 +4,7 @@ export type QualityStatus = 'RELEASED' | 'QUARANTINED' | 'RECALLED' | 'FROZEN';
 export type WorkOrderStatus = 'OPEN' | 'MATERIALS_RESERVED' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'CLOSED' | 'CANCELLED';
 export type ReservationStatus = 'ACTIVE' | 'RELEASED' | 'ISSUED';
 export type CertificateStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED';
-export type CustomsStatus = 'DRAFT' | 'SUBMITTED' | 'INSPECTION' | 'RELEASED' | 'REJECTED';
+export type CustomsStatus = 'DRAFT' | 'SUBMITTED' | 'INSPECTION' | 'RELEASED' | 'REJECTED' | 'VOID';
 export type ReturnStatus = 'EXPECTED' | 'RECEIVED' | 'ACCEPTED' | 'REJECTED' | 'SCRAPPED';
 
 export interface PartStock {
@@ -147,18 +147,52 @@ export interface LedgerEntry {
   createdAt: string;
 }
 
+export type ShipmentStatus = 'ACTIVE' | 'SPLIT' | 'CANCELLED';
+
 export interface ShipmentLine {
   id: string;
   orderId: string;
   partNumber: string;
   serialNumber?: string;
   quantity: number;
+  /** stock this line is allocated against; reserved quantity is tracked there */
+  stockId?: string;
 }
 
 export interface Shipment {
   id: string;
+  tenantId: TenantId;
   orderId: string;
   parentId?: string;
-  status: 'ACTIVE' | 'SPLIT' | 'CANCELLED';
+  status: ShipmentStatus;
   lines: ShipmentLine[];
+  /** idempotency key of the split that generated this shipment, if any */
+  splitKey?: string;
+  version: number;
+}
+
+export type SplitRequestStatus = 'COMPLETED' | 'ROLLED_BACK';
+
+export interface ShipmentSplitRequest {
+  key: string;
+  tenantId: TenantId;
+  parentId: string;
+  childIds: string[];
+  /** hash of the requested groups, so retries with different payloads are rejected */
+  groupsHash: string;
+  status: SplitRequestStatus;
+  attempts: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ShipmentAllocation {
+  id: string;
+  tenantId: TenantId;
+  shipmentId: string;
+  lineId: string;
+  stockId: string;
+  quantity: number;
+  status: ReservationStatus;
+  version: number;
 }
