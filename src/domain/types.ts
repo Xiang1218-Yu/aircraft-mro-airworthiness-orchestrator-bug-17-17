@@ -157,8 +157,18 @@ export interface ShipmentLine {
 
 export interface Shipment {
   id: string;
+  tenantId?: string;
   orderId: string;
   parentId?: string;
+  splitRequestId?: string;
   status: 'ACTIVE' | 'SPLIT' | 'CANCELLED';
   lines: ShipmentLine[];
+}
+
+export interface ShipmentSplitRequest {
+  requestId: string;
+  parentId: string;
+  fingerprint: string;
+  childrenIds: string[];
+  status: 'ACTIVE' | 'ROLLED_BACK';
 }

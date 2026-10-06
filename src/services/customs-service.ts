@@ -5,6 +5,12 @@ export class CustomsService {
   constructor(private readonly store: Store) {}
 
   create(tenantId: string, shipmentId: string): CustomsDeclaration {
+    // Only an effective shipment detail may carry a customs declaration:
+    // a split parent and cancelled/non-existent shipments are not declarable.
+    const shipment = this.store.shipments.get(shipmentId);
+    if (shipment && shipment.status !== 'ACTIVE') {
+      throw new Error(`cannot declare customs for ${shipment.status.toLowerCase()} shipment ${shipmentId}`);
+    }
     const declaration: CustomsDeclaration = { id: this.store.nextId('customs'), tenantId, shipmentId, version: 1, status: 'DRAFT', updatedAt: this.store.now() };
     this.store.customs.set(declaration.id, declaration);
     return declaration;

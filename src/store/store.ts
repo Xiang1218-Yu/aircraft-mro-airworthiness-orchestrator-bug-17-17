@@ -64,5 +64,6 @@ export class Store {
     this.ledger.push({ ...entry, id: this.nextId('ledger'), createdAt: this.now() });
   }
   readonly shipments = new Map<string, import('../domain/types.js').Shipment>();
+  readonly shipmentSplitRequests = new Map<string, import('../domain/types.js').ShipmentSplitRequest>();
   readonly customsLines = new Map<string, number>();
 }
